@@ -81,12 +81,13 @@ class CustomerStatementWizard(models.TransientModel):
             ('state','=','posted')])
 
         for payment in payments_objs:
+            details = f"{payment.name}: {payment.journal_id.name} payment for {payment.ref or ''}"
             data = {
                 'id': payment.id,
                 'date': payment.date.strftime('%m/%d/%Y'),  
                 'transaction': 'Payment Received',
                 'name': payment.name,         # Payment name
-                'details': f"{payment.journal_id.name} payment for {payment.ref or ''}",  # Journal name + memo
+                'details': details,  # Journal name + memo
                 'amount': 0.0,                # Fixed 0.0 as per the requirement
                 'payment': payment.amount,    # Payment amount
                 'balance': 0.0,               # Fixed 0.0 as per the requirement
@@ -102,7 +103,7 @@ class CustomerStatementWizard(models.TransientModel):
                     # If multiple sale orders are found, concatenate their names
                     sale_order_name = ', '.join(sale_orders.mapped('name'))
 
-            details = f'Invoice for {sale_order_name}' if inv.ref  else (f'Invoice for {sale_order_name}' if sale_order_name else inv.name)
+            details = f'{inv.name}: Invoice for {inv.ref}' if inv.ref  else (f'{inv.name}: Invoice for {sale_order_name}' if sale_order_name else inv.name)
             data = {
                 'id': inv.id,
                 'date': inv.invoice_date.strftime('%m/%d/%Y') if inv.invoice_date else '',  

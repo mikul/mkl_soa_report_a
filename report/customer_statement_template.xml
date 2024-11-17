@@ -9,7 +9,7 @@
                     <div class="page">
 
                         <div style="width: 100%; text-align: right;">
-                            <h2>Customer Statement of Account</h2>
+                            <h3>Customer Statement of Account</h3>
                         </div>
 
                         <div style="width: 100%; text-align: right;">
@@ -70,7 +70,7 @@
                         </div>
 
                         <h3>Transaction Summary</h3>
-                        <table class="table table-condensed">
+                        <table class="table table-condensed" style="font-size: 0.85em;">
                             <thead>
                                 <tr>
                                     <th>Date</th>
