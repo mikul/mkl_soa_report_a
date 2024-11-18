@@ -147,5 +147,6 @@ class CustomerStatementWizard(models.TransientModel):
                 'transactions': transactions
             }
         }
+        print(self.env['res.currency'].browse(36).name,self.env['res.currency'].browse(36).position)
         # Pass data in the context
         return self.env.ref('mkl_soa_report_a.action_variable_month_customer_statement_report').with_context(data=data).report_action(self)

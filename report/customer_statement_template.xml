@@ -33,7 +33,7 @@
                                 </p>
                                 <strong>Address:</strong>
                                 <p>
-                                    <span t-esc="doc.partner_id.contact_address"/>  <!-- Customer Address -->
+                                    <span t-esc="', '.join(filter(None, [doc.partner_id.street, doc.partner_id.street2, doc.partner_id.city, doc.partner_id.state_id.name, doc.partner_id.zip, doc.partner_id.country_id.name]))"/> 
                                 </p>
                             </div>
                             <div style="float: left; width: 50%;">
@@ -47,21 +47,65 @@
                                     <tbody>
                                         <tr>
                                             <td style="text-align: left; width: 200px;">Opening Balance:</td>
-                                            <td style="text-align: right;"><span t-esc="data.get('form', {}).get('opening_balance', 0.0)" t-options='{"widget": "float", "precision": 2}'/></td>
+                                            <td style="text-align: right;">
+                                                <t t-if="env.company.currency_id.position == 'before'">
+                                                    <span t-esc="env.company.currency_id.symbol"/>
+                                                    <span t-esc="data.get('form', {}).get('opening_balance', 0.0)" 
+                                                          t-options='{"widget": "float", "precision": 2}'/>
+                                                </t>
+                                                <t t-else="">
+                                                    <span t-esc="data.get('form', {}).get('opening_balance', 0.0)" 
+                                                          t-options='{"widget": "float", "precision": 2}'/>
+                                                    <span t-esc="env.company.currency_id.symbol"/>
+                                                </t>
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td style="text-align: left; width: 200px;">Invoiced Amount:</td>
-                                            <td style="text-align: right;"><span t-esc="data.get('form', {}).get('invoiced_amount', 0.0)" t-options='{"widget": "float", "precision": 2}'/></td>
+                                            <td style="text-align: right;">
+                                                <t t-if="env.company.currency_id.position == 'before'">
+                                                    <span t-esc="env.company.currency_id.symbol"/>
+                                                    <span t-esc="data.get('form', {}).get('invoiced_amount', 0.0)" 
+                                                          t-options='{"widget": "float", "precision": 2}'/>
+                                                </t>
+                                                <t t-else="">
+                                                    <span t-esc="data.get('form', {}).get('invoiced_amount', 0.0)" 
+                                                          t-options='{"widget": "float", "precision": 2}'/>
+                                                    <span t-esc="env.company.currency_id.symbol"/>
+                                                </t>
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td style="text-align: left; width: 200px;">Amount Paid:</td>
-                                            <td style="text-align: right;"><span t-esc="data.get('form', {}).get('amount_paid', 0.0)" t-options='{"widget": "float", "precision": 2}'/></td>
+                                            <td style="text-align: right;">
+                                                <t t-if="env.company.currency_id.position == 'before'">
+                                                    <span t-esc="env.company.currency_id.symbol"/>
+                                                    <span t-esc="data.get('form', {}).get('amount_paid', 0.0)" 
+                                                          t-options='{"widget": "float", "precision": 2}'/>
+                                                </t>
+                                                <t t-else="">
+                                                    <span t-esc="data.get('form', {}).get('amount_paid', 0.0)" 
+                                                          t-options='{"widget": "float", "precision": 2}'/>
+                                                    <span t-esc="env.company.currency_id.symbol"/>
+                                                </t>
+                                            </td>
                                         </tr>
                                     </tbody>
                                     <tfoot>
                                         <tr style="font-weight: bold;">
                                             <td style="text-align: left; width: 200px;">Balance Due:</td>
-                                            <td style="text-align: right;"><span t-esc="data.get('form', {}).get('balance_due', 0.0)" t-options='{"widget": "float", "precision": 2}'/></td>
+                                            <td style="text-align: right;">
+                                                <t t-if="env.company.currency_id.position == 'before'">
+                                                    <span t-esc="env.company.currency_id.symbol"/>
+                                                    <span t-esc="data.get('form', {}).get('balance_due', 0.0)" 
+                                                          t-options='{"widget": "float", "precision": 2}'/>
+                                                </t>
+                                                <t t-else="">
+                                                    <span t-esc="data.get('form', {}).get('balance_due', 0.0)" 
+                                                          t-options='{"widget": "float", "precision": 2}'/>
+                                                    <span t-esc="env.company.currency_id.symbol"/>
+                                                </t>
+                                            </td>
                                         </tr>
                                     </tfoot>
                                 </table>
