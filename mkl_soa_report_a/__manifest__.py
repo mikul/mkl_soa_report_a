@@ -16,11 +16,11 @@ It allows users to generate a detailed customer statement of account with the fo
     
 This app is ideal for businesses that want to provide clear and concise statements to their customers.
 """,
-    'price': 60.00,
+    'price': 35.00,
     'currency': 'EUR',
     'license': 'OPL-1',
-    'author': 'Your Name or Company',
-    'website': 'https://yourcompanywebsite.com',
+    'author': 'Mikul Buncha',
+    'company': 'Mikool Inc',
     'depends': ['account', 'base'],
     'data': [
         'security/ir.model.access.csv',
