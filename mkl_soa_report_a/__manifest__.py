@@ -32,4 +32,5 @@ This app is ideal for businesses that want to provide clear and concise statemen
     'installable': True,
     'application': False,
     'auto_install': False,
+    'odoo_version': ['16.0', '17.0'],
 }
