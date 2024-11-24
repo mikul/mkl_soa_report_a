@@ -1,6 +1,6 @@
 {
     'name': 'Customer Statement of Account Report',
-    'version': '17.1',
+    'version': '2.1',
 
     'category': 'Accounting',
     'summary': 'Detailed Customer Statement of Account with Transaction History',
