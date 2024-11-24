@@ -30,6 +30,13 @@ class CustomerStatementWizard(models.TransientModel):
             ('move_type', '=', 'out_invoice')
         ])
 
+        crn_objs = self.env['account.move'].search([
+            ('partner_id', '=', self.partner_id.id),
+            ('state', '=', 'posted'),
+            ('invoice_date', '<', self.date_from),  # Invoices before the start date
+            ('move_type', '=', 'out_refund')
+        ])
+
         payments_objs = self.env['account.payment'].search([
             ('partner_id', '=', self.partner_id.id),
             ('date', '<', self.date_from),  # Payments before the start date
@@ -38,6 +45,7 @@ class CustomerStatementWizard(models.TransientModel):
 
         # Initialize the list for payment details
         sales_details = [] 
+        credit_details = [] 
         payment_details = []
 
         # Initialize opening balance variables
@@ -47,6 +55,10 @@ class CustomerStatementWizard(models.TransientModel):
         # Calculate opening balance using invoices before start_date
         for inv in inv_objs:
             opening_balance_invoices += inv.amount_total
+
+        # Calculate opening balance using credit before start_date
+        for inv in crn_objs:
+            opening_balance_invoices -= inv.amount_total
 
         # Calculate opening balance using payments before start_date
         for payment in payments_objs:
@@ -74,6 +86,12 @@ class CustomerStatementWizard(models.TransientModel):
             ('invoice_date', '>=', self.date_from),
             ('invoice_date', '<=', self.date_to),
             ('move_type', '=', 'out_invoice')])
+        crn_objs = self.env['account.move'].search([
+            ('partner_id','=',self.partner_id.id),
+            ('state','=','posted'),
+            ('invoice_date', '>=', self.date_from),
+            ('invoice_date', '<=', self.date_to),
+            ('move_type', '=', 'out_refund')])
         payments_objs = self.env['account.payment'].search([
             ('partner_id','=',self.partner_id.id),
             ('date', '>=', self.date_from),
@@ -81,7 +99,7 @@ class CustomerStatementWizard(models.TransientModel):
             ('state','=','posted')])
 
         for payment in payments_objs:
-            details = f"{payment.name}: {payment.journal_id.name} payment for {payment.ref or ''}"
+            details = f"{payment.name}: {payment.journal_id.name} payment for {payment.ref or ''}" if payment.ref else payment.name 
             data = {
                 'id': payment.id,
                 'date': payment.date.strftime('%m/%d/%Y'),  
@@ -93,6 +111,28 @@ class CustomerStatementWizard(models.TransientModel):
                 'balance': 0.0,               # Fixed 0.0 as per the requirement
             }
             payment_details.append(data)
+
+        for inv in crn_objs:
+            sale_order_name = ''
+            sale_lines = inv.invoice_line_ids.mapped('sale_line_ids')
+            if sale_lines:
+                sale_orders = sale_lines.mapped('order_id')
+                if sale_orders:
+                    # If multiple sale orders are found, concatenate their names
+                    sale_order_name = ', '.join(sale_orders.mapped('name'))
+
+            details = f'{inv.name}: Creadit for {inv.ref}' if inv.ref  else (f'{inv.name}: Credit for {sale_order_name}' if sale_order_name else inv.name)
+            data = {
+                'id': inv.id,
+                'date': inv.invoice_date.strftime('%m/%d/%Y') if inv.invoice_date else '',  
+                'transaction': 'Credit Note',
+                'name': inv.name,         
+                'details': details,             # Credit details
+                'amount': inv.amount_total * -1,# Make it negative                
+                'payment': 0.0,                 # Fixed 0.0 as per the requirement
+                'balance': 0.0,                 # Fixed 0.0 as per the requirement
+            }
+            credit_details.append(data)
 
         for inv in inv_objs:
             sale_order_name = ''
@@ -111,13 +151,13 @@ class CustomerStatementWizard(models.TransientModel):
                 'name': inv.name,         
                 'details': details,             # Sales details
                 'amount': inv.amount_total,                
-                'payment': 0.0,        
-                'balance': 0.0,               
+                'payment': 0.0,                 # Fixed 0.0 as per the requirement
+                'balance': 0.0,                 # Fixed 0.0 as per the requirement
             }
             sales_details.append(data)
 
         # Output the list of dictionaries
-        transactions = opening_details + payment_details + sales_details
+        transactions = opening_details + payment_details + sales_details + credit_details
         transactions = sorted(
             transactions,
             key=lambda x: (datetime.strptime(x['date'], '%m/%d/%Y'),x['transaction'], x['id'])
@@ -133,6 +173,9 @@ class CustomerStatementWizard(models.TransientModel):
             transaction['balance'] = running_balance
             total_amount += transaction['amount']
             total_payment += transaction['payment']
+
+        total_amount -= opening_details[0]['amount']
+        total_payment -= opening_details[0]['payment']
          
         # Prepare data for the report
         data = {
@@ -147,6 +190,5 @@ class CustomerStatementWizard(models.TransientModel):
                 'transactions': transactions
             }
         }
-        print(self.env['res.currency'].browse(36).name,self.env['res.currency'].browse(36).position)
         # Pass data in the context
         return self.env.ref('mkl_soa_report_a.action_variable_month_customer_statement_report').with_context(data=data).report_action(self)
