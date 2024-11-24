@@ -77,6 +77,24 @@
             max-width: 900px;
         }
 
+        /* Screenshot Section */
+        .screenshot-section {
+            margin: 20px auto;
+            max-width: 900px;
+        }
+        .screenshot-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px; /* Space between screenshots */
+        }
+        .screenshot-grid img {
+            width: 100%; /* Fit the width of the card */
+            height: auto; /* Maintain aspect ratio */
+            border: 2px solid #E0E0E0;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
         /* Footer Styles */
         footer {
             background-color: #875A7B; /* Odoo purple */
@@ -167,6 +185,14 @@
         </p>
     </div>
 
+    <div class="card screenshot-section">
+        <h2>Screenshots</h2>
+        <div class="screenshot-grid">
+            <img src="screenshot1.png" alt="Screenshot 1">
+            <img src="screenshot2.png" alt="Screenshot 2">
+            <img src="screenshot3.png" alt="Screenshot 3">
+        </div>
+    </div>
 
 </body>
 </html>
